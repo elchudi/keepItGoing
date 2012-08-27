@@ -68,7 +68,7 @@ public class WavAudioActivity extends Activity {
             file.mkdirs();
         }
 
-        return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + AUDIO_RECORDER_FILE_EXT_WAV);
+        return (file.getAbsolutePath() + "/" + "recorded_file" + AUDIO_RECORDER_FILE_EXT_WAV);
     }
     
     private String getComparisonFile() {
@@ -167,7 +167,7 @@ public class WavAudioActivity extends Activity {
         Log.d("MI_DEP", "Filename: " + getFilename());
         deleteTempFile();
 
-        compareWithStoredAudio(getFilename());
+//        compareWithStoredAudio(getFilename());
     }
 
     private void compareWithStoredAudio(String filename) {
