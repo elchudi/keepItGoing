@@ -17,6 +17,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -167,7 +168,16 @@ public class WavAudioActivity extends Activity {
         Log.d("MI_DEP", "Filename: " + getFilename());
         deleteTempFile();
 
-//        compareWithStoredAudio(getFilename());
+        Handler compare = new Handler();
+        
+        compare.postDelayed(new Runnable() {
+            
+            @Override
+            public void run() {
+                Log.d("MI_DEP", "compairing");
+                compareWithStoredAudio(getFilename());
+            }
+        }, 5000);
     }
 
     private void compareWithStoredAudio(String filename) {
