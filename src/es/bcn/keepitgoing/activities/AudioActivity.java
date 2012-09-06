@@ -30,6 +30,7 @@ public class AudioActivity extends Activity {
     private void onRecord(boolean start) {
         if (start) {
             startRecording();
+            //comentt that i forgot to change
         } else {
             stopRecording();
         }
