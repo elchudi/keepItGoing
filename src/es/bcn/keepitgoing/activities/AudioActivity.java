@@ -2,12 +2,15 @@ package es.bcn.keepitgoing.activities;
 
 import java.io.IOException;
 
-import com.musicg.wave.Wave;
+import es.bcn.keepitgoing.R;
+import es.bcn.keepitgoing.com.ComunicationIn;
+import es.bcn.keepitgoing.com.ComunicationOut;
 
 import android.app.Activity;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -16,16 +19,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-public class AudioActivity extends Activity {
+public class AudioActivity extends Activity implements GetCurrentMilis{
     private static final String LOG_TAG = "AudioRecordTest";
     private static final String TAG = AudioActivity.class.getName();
     private static String mFileName = null;
+    private long milis;
 
     private RecordButton mRecordButton = null;
     private MediaRecorder mRecorder = null;
 
     private PlayButton mPlayButton = null;
     private MediaPlayer mPlayer = null;
+    private ComunicationOut out;
+    private ComunicationIn in;
 
     private void onRecord(boolean start) {
         if (start) {
@@ -45,34 +51,37 @@ public class AudioActivity extends Activity {
 
     private void startPlaying() {
         mPlayer = new MediaPlayer();
+        Uri uri = Uri.parse("android.resource://es.bcn.keepitgoing/" + R.raw.song);
         try {
-            mPlayer.setDataSource(mFileName);
+            out = new ComunicationOut(this);
+            mPlayer.setDataSource(this, uri);
             mPlayer.prepare();
             mPlayer.start();
+            out.start();
+            milis = System.currentTimeMillis();
         } catch (IOException e) {
             Log.e(LOG_TAG, "prepare() failed");
         }
     }
 
     private void stopPlaying() {
+        out.stop();
         mPlayer.release();
         mPlayer = null;
     }
 
     private void startRecording() {
-        mRecorder = new MediaRecorder();
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mRecorder.setOutputFile(mFileName);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
+        mPlayer = new MediaPlayer();
+        Uri uri = Uri.parse("android.resource://es.bcn.keepitgoing/" + R.raw.song);
         try {
-            mRecorder.prepare();
+            mPlayer.setDataSource(this, uri);
+            mPlayer.prepare();
+            mPlayer.start();
         } catch (IOException e) {
             Log.e(LOG_TAG, "prepare() failed");
         }
-
-        mRecorder.start();
+        in = new ComunicationIn(mPlayer);
+        in.start();
     }
 
     private void stopRecording() {
@@ -92,7 +101,7 @@ public class AudioActivity extends Activity {
                 if (mStartRecording) {
                     setText("Stop recording");
                 } else {
-                    setText("Start recording");
+                    setText("Start listening");
                 }
                 mStartRecording = !mStartRecording;
             }
@@ -157,4 +166,10 @@ public class AudioActivity extends Activity {
             mPlayer = null;
         }
     }
+
+    @Override
+    public long getCurrentMilis() {
+        return mPlayer.getCurrentPosition();
+    }
 }
+
